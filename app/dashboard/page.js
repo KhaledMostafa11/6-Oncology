@@ -104,6 +104,13 @@ export default function DashboardPage() {
       color: "from-teal-400 to-emerald-500",
       icon: "chart",
     },
+    {
+      title: "Manage Staff",
+      detail: "Add or remove oncologists and nurses.",
+      href: "/dashboard/staff",
+      color: "from-rose-400 to-pink-500",
+      icon: "users",
+    },
   ];
 
   const staffQuickLinks = [
@@ -213,6 +220,15 @@ export default function DashboardPage() {
           <svg {...commonProps}>
             <path d="M20 21a8 8 0 1 0-16 0" />
             <circle cx="12" cy="7" r="4" />
+          </svg>
+        );
+      case "users":
+        return (
+          <svg {...commonProps}>
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
           </svg>
         );
       case "chart":
@@ -390,7 +406,7 @@ export default function DashboardPage() {
                 Demo Tip
               </h3>
               <p className="text-slate-900 mb-6">
-                For discussion, open the assistant and ask: “What should I demo?”
+                For discussion, open the assistant and ask: "What should I demo?"
                 It will explain the current page and the exact workflow.
               </p>
               <div className="flex flex-wrap gap-4">
@@ -412,6 +428,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-
-

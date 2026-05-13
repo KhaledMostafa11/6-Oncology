@@ -7,7 +7,8 @@ export async function GET() {
       `SELECT u.user_id AS id,
               u.role,
               CONCAT(u.first_name, ' ', u.last_name) AS name,
-              COALESCE(sp.specialization, u.role) AS specialty
+              COALESCE(sp.specialization, u.role) AS specialty,
+              u.email
        FROM users u
        LEFT JOIN staff_profiles sp ON sp.user_id = u.user_id
        WHERE u.is_active = TRUE
@@ -20,6 +21,48 @@ export async function GET() {
     console.error("Staff API error:", error);
     return NextResponse.json(
       { success: false, message: "Staff database is not available." },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json(
+        { success: false, message: "Staff ID is required." },
+        { status: 400 }
+      );
+    }
+
+    // Soft delete — mark as inactive rather than hard delete
+    const result = await pool.query(
+      `UPDATE users
+       SET is_active = FALSE
+       WHERE user_id = $1
+         AND role IN ('Oncologist', 'Oncology Nurse')
+       RETURNING user_id`,
+      [id]
+    );
+
+    if (result.rowCount === 0) {
+      return NextResponse.json(
+        { success: false, message: "Staff member not found." },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: "Staff member removed successfully.",
+    });
+  } catch (error) {
+    console.error("Staff DELETE error:", error);
+    return NextResponse.json(
+      { success: false, message: "Could not remove staff member." },
       { status: 500 }
     );
   }
