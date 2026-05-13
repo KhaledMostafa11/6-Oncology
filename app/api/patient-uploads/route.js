@@ -1,16 +1,6 @@
 import { NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
 import pool from "@/lib/db";
 import { requireRole } from "@/lib/auth";
-
-const uploadDirectory = path.join(process.cwd(), "public", "uploads", "patients");
-
-const sanitizeFileName = (name) =>
-  name
-    .replace(/[^a-zA-Z0-9._-]/g, "_")
-    .replace(/_+/g, "_")
-    .slice(0, 200);
 
 export async function GET(request) {
   try {
@@ -123,23 +113,15 @@ export async function POST(request) {
       );
     }
 
-    await fs.promises.mkdir(uploadDirectory, { recursive: true });
-
     const savedUploads = [];
     for (const file of files) {
       if (!file || typeof file === "string") continue;
       const originalName = file.name || "upload";
-      const safeName = sanitizeFileName(originalName);
-      const fileName = `${patientId}-${Date.now()}-${safeName}`;
-      const absolutePath = path.join(uploadDirectory, fileName);
       const fileData = Buffer.from(await file.arrayBuffer());
-      await fs.promises.writeFile(absolutePath, fileData);
-
-      const filePath = `/uploads/patients/${fileName}`;
       const result = await pool.query(
         `INSERT INTO patient_uploads
-          (patient_id, file_name, file_type, file_size, file_path)
-         VALUES ($1, $2, $3, $4, $5)
+          (patient_id, file_name, file_type, file_size, file_path, file_data)
+         VALUES ($1, $2, $3, $4, $5, $6)
          RETURNING upload_id AS id,
                    patient_id,
                    file_name AS fileName,
@@ -147,11 +129,26 @@ export async function POST(request) {
                    file_size AS fileSize,
                    file_path AS filePath,
                    uploaded_at AS uploadedAt`,
-        [patientId, originalName, file.type || "application/octet-stream", fileData.length, filePath]
+        [
+          patientId,
+          originalName,
+          file.type || "application/octet-stream",
+          fileData.length,
+          "",
+          fileData,
+        ]
+      );
+
+      const upload = result.rows[0];
+      const filePath = `/api/patient-uploads/${upload.id}`;
+      await pool.query(
+        `UPDATE patient_uploads SET file_path = $1 WHERE upload_id = $2`,
+        [filePath, upload.id]
       );
 
       savedUploads.push({
-        ...result.rows[0],
+        ...upload,
+        filePath,
         patientName: patientResult.rows[0].full_name,
       });
     }

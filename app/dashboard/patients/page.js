@@ -172,7 +172,7 @@ export default function PatientsPage() {
         setPatientUploads(
           (uploadsData.uploads || []).map((upload) => ({
             ...upload,
-            previewUrl: upload.filePath,
+            previewUrl: upload.filePath || `/api/patient-uploads/${upload.id}`,
             size: upload.fileSize
               ? `${Math.max(1, Math.round(upload.fileSize / 1024))} KB`
               : "",
@@ -208,7 +208,7 @@ export default function PatientsPage() {
       setPatientUploads(
         (data.uploads || []).map((upload) => ({
           ...upload,
-          previewUrl: upload.filePath,
+          previewUrl: upload.filePath || `/api/patient-uploads/${upload.id}`,
           size: upload.fileSize
             ? `${Math.max(1, Math.round(upload.fileSize / 1024))} KB`
             : "",
@@ -278,7 +278,7 @@ export default function PatientsPage() {
       setPatientUploads((current) => [
         ...data.uploads.map((upload) => ({
           ...upload,
-          previewUrl: upload.filePath,
+          previewUrl: upload.filePath || `/api/patient-uploads/${upload.id}`,
           size: upload.fileSize
             ? `${Math.max(1, Math.round(upload.fileSize / 1024))} KB`
             : "",

@@ -7,7 +7,8 @@
     "build": "next build --webpack",
     "postbuild": "node scripts/copy-standalone-assets.js",
     "start": "node .next/standalone/server.js",
-    "db:clear-data": "node scripts/clear-operational-data.js"
+    "db:clear-data": "node scripts/clear-operational-data.js",
+    "db:schema-sync": "node scripts/sync-db-schema.js"
   },
   "dependencies": {
     "gsap": "^3.15.0",

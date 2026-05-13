@@ -161,6 +161,7 @@ CREATE TABLE IF NOT EXISTS patient_uploads (
     file_type VARCHAR(80) NOT NULL,
     file_size INT NOT NULL DEFAULT 0,
     file_path VARCHAR(255) NOT NULL,
+    file_data BYTEA,
     notes TEXT,
     uploaded_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
