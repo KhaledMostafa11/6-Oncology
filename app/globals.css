@@ -1,0 +1,267 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f6fafb;
+  --foreground: #101828;
+  --surface: #ffffff;
+  --surface-soft: #f8fbfc;
+  --line: #d9e5e8;
+  --line-strong: #b9d3d9;
+  --ink: #0f172a;
+  --muted: #607083;
+  --primary: #057f94;
+  --primary-strong: #075e72;
+  --primary-soft: #e7f8fa;
+  --secondary: #0f9f7a;
+  --warning: #d97706;
+  --danger: #e11d48;
+  --shadow-sm: 0 10px 24px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 18px 46px rgba(15, 23, 42, 0.09);
+  --radius: 10px;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background:
+    radial-gradient(circle at top left, rgba(5, 127, 148, 0.08), transparent 28rem),
+    radial-gradient(circle at top right, rgba(15, 159, 122, 0.07), transparent 26rem),
+    var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+  text-rendering: geometricPrecision;
+}
+
+::selection {
+  background: rgba(5, 127, 148, 0.18);
+  color: var(--ink);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+main {
+  color: var(--ink);
+}
+
+a,
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button,
+a {
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid rgba(5, 127, 148, 0.2);
+  outline-offset: 2px;
+}
+
+input,
+select,
+textarea {
+  border-color: var(--line) !important;
+  border-radius: 8px !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 4px rgba(5, 127, 148, 0.1) !important;
+}
+
+.clinical-shell {
+  background:
+    radial-gradient(circle at 12% 0%, rgba(5, 127, 148, 0.12), transparent 32rem),
+    radial-gradient(circle at 88% 8%, rgba(15, 159, 122, 0.1), transparent 30rem),
+    linear-gradient(180deg, #fbfdfe 0%, #f4f9fa 45%, #eef6f7 100%);
+}
+
+.clinical-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.soft-card {
+  background: rgba(255, 255, 255, 0.96) !important;
+  border-color: var(--line) !important;
+  border-radius: var(--radius) !important;
+  box-shadow: var(--shadow-sm) !important;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease;
+}
+
+.soft-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--line-strong) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+.premium-panel {
+  background:
+    linear-gradient(135deg, rgba(7, 94, 114, 0.98), rgba(9, 121, 116, 0.92)),
+    #083344;
+  box-shadow: 0 28px 80px rgba(7, 94, 114, 0.2);
+}
+
+.pulse-dot {
+  position: relative;
+}
+
+.pulse-dot::after {
+  animation: pulse-ring 1.8s ease-out infinite;
+  border: 1px solid rgba(45, 212, 191, 0.6);
+  border-radius: 999px;
+  content: "";
+  inset: -7px;
+  position: absolute;
+}
+
+.care-line {
+  background: linear-gradient(90deg, var(--primary), var(--secondary), #8bbf3d);
+  background-size: 200% 100%;
+  animation: flow-line 4s ease-in-out infinite;
+}
+
+.progress-fill {
+  animation: grow-width 900ms ease both;
+  transform-origin: left;
+}
+
+.fadeUp {
+  animation: fade-up 520ms ease both;
+}
+
+.app-nav {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border-color: var(--line) !important;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06) !important;
+}
+
+.brand-mark {
+  background: linear-gradient(135deg, var(--primary), var(--secondary)) !important;
+  box-shadow: 0 10px 24px rgba(5, 127, 148, 0.18) !important;
+}
+
+.bg-cyan-700,
+.hover\:bg-cyan-800:hover {
+  background-color: var(--primary) !important;
+}
+
+.text-cyan-700,
+.text-cyan-800,
+.hover\:text-cyan-700:hover,
+.hover\:text-cyan-800:hover {
+  color: var(--primary) !important;
+}
+
+.border-cyan-100,
+.border-cyan-200 {
+  border-color: #ccebf0 !important;
+}
+
+.bg-cyan-50 {
+  background-color: var(--primary-soft) !important;
+}
+
+.text-slate-500,
+.text-gray-500,
+.text-slate-600 {
+  color: var(--muted) !important;
+}
+
+.text-slate-950,
+.text-slate-900,
+.text-gray-800 {
+  color: var(--ink) !important;
+}
+
+.bg-white {
+  background-color: var(--surface) !important;
+}
+
+.bg-slate-50 {
+  background-color: var(--surface-soft) !important;
+}
+
+.border-slate-200,
+.border-slate-300 {
+  border-color: var(--line) !important;
+}
+
+.shadow-sm {
+  box-shadow: var(--shadow-sm) !important;
+}
+
+.rounded-lg {
+  border-radius: var(--radius) !important;
+}
+
+.app-section-title {
+  letter-spacing: 0;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-ring {
+  from {
+    opacity: 0.65;
+    transform: scale(0.72);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.55);
+  }
+}
+
+@keyframes flow-line {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes grow-width {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
