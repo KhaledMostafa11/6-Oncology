@@ -161,6 +161,24 @@ export default function PatientsPage() {
         }))
       );
       setUser(parsedUser);
+
+      const uploadsResponse = await fetch("/api/patient-uploads", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const uploadsData = await uploadsResponse.json();
+      if (uploadsResponse.ok && uploadsData.success) {
+        setPatientUploads(
+          (uploadsData.uploads || []).map((upload) => ({
+            ...upload,
+            previewUrl: upload.filePath,
+            size: upload.fileSize
+              ? `${Math.max(1, Math.round(upload.fileSize / 1024))} KB`
+              : "",
+          }))
+        );
+      }
     } catch (error) {
       console.error("Error fetching patient data:", error);
       setMessage({
@@ -169,6 +187,39 @@ export default function PatientsPage() {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchPatientUploads = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    try {
+      const response = await fetch("/api/patient-uploads", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Could not load patient uploads.");
+      }
+
+      setPatientUploads(
+        (data.uploads || []).map((upload) => ({
+          ...upload,
+          previewUrl: upload.filePath,
+          size: upload.fileSize
+            ? `${Math.max(1, Math.round(upload.fileSize / 1024))} KB`
+            : "",
+        }))
+      );
+    } catch (error) {
+      console.error("Uploads API error:", error);
+      setMessage({
+        text: error.message || "Could not load patient uploads.",
+        type: "error",
+      });
     }
   };
 
@@ -197,17 +248,54 @@ export default function PatientsPage() {
   const formatAppointmentTime = (appointment) =>
     `${formatDisplayDate(appointment.date)} at ${appointment.time}`;
 
-  const handlePatientFileUpload = (event) => {
+  const handlePatientFileUpload = async (event) => {
     const files = Array.from(event.target.files || []);
-    setPatientUploads((current) => [
-      ...files.map((file) => ({
-        id: `${file.name}-${Date.now()}`,
-        name: file.name,
-        size: `${Math.max(1, Math.round(file.size / 1024))} KB`,
-        previewUrl: URL.createObjectURL(file),
-      })),
-      ...current,
-    ]);
+    const currentPatient = patients.find(
+      (patient) => patient.PATname === `${user?.firstname || ""} ${user?.lastname || ""}`
+    );
+    if (!files.length || !currentPatient) {
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("patientId", currentPatient.id);
+    files.forEach((file) => formData.append("files", file));
+
+    try {
+      const response = await fetch("/api/patient-uploads", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+        },
+        body: formData,
+      });
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Could not upload patient files.");
+      }
+
+      setPatientUploads((current) => [
+        ...data.uploads.map((upload) => ({
+          ...upload,
+          previewUrl: upload.filePath,
+          size: upload.fileSize
+            ? `${Math.max(1, Math.round(upload.fileSize / 1024))} KB`
+            : "",
+        })),
+        ...current,
+      ]);
+      setMessage({ text: "Images uploaded successfully.", type: "success" });
+    } catch (error) {
+      console.error("Upload error:", error);
+      setMessage({
+        text: error.message || "Could not upload patient files.",
+        type: "error",
+      });
+    } finally {
+      event.target.value = "";
+      setTimeout(() => setMessage({ text: "", type: "" }), 3000);
+    }
   };
 
   const handleAddPrescription = async (patientId) => {
@@ -813,46 +901,81 @@ export default function PatientsPage() {
                 )}
               </div>
 
-              <div className="fadeUp rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-                <h2 className="text-3xl font-bold text-slate-950 mb-3">
-                  Patient Uploads
-                </h2>
-                <p className="mb-5 text-sm text-slate-600">
-                  Patients can upload scan images, lab reports, or referral
-                  documents for the care team to review.
-                </p>
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handlePatientFileUpload}
-                  className="block w-full rounded-md border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-700"
-                />
-                <div className="mt-5 grid gap-4 md:grid-cols-3">
-                  {patientUploads.length === 0 ? (
-                    <p className="text-sm text-slate-500">
-                      No patient images uploaded yet.
-                    </p>
-                  ) : (
-                    patientUploads.map((file) => (
+              {isPatient && currentPatient && (
+                <div className="fadeUp rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+                  <h2 className="text-3xl font-bold text-slate-950 mb-3">
+                    Patient Uploads
+                  </h2>
+                  <p className="mb-5 text-sm text-slate-600">
+                    Patients can upload scan images, lab reports, or referral
+                    documents for the care team to review.
+                  </p>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handlePatientFileUpload}
+                    className="block w-full rounded-md border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-700"
+                  />
+                  <div className="mt-5 grid gap-4 md:grid-cols-3">
+                    {patientUploads.filter((upload) => upload.patientId === currentPatient.id).length === 0 ? (
+                      <p className="text-sm text-slate-500">
+                        No patient images uploaded yet.
+                      </p>
+                    ) : (
+                      patientUploads
+                        .filter((upload) => upload.patientId === currentPatient.id)
+                        .map((file) => (
+                          <div
+                            key={file.id}
+                            className="rounded-lg border border-slate-200 bg-slate-50 p-3"
+                          >
+                            <img
+                              src={file.previewUrl}
+                              alt={file.fileName}
+                              className="h-28 w-full rounded-md object-cover"
+                            />
+                            <p className="mt-2 text-sm font-semibold text-slate-800">
+                              {file.fileName}
+                            </p>
+                            <p className="text-xs text-slate-500">{file.size}</p>
+                          </div>
+                        ))
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {!isPatient && patientUploads.length > 0 && (
+                <div className="fadeUp rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+                  <h2 className="text-3xl font-bold text-slate-950 mb-3">
+                    My Patients' Uploads
+                  </h2>
+                  <p className="mb-5 text-sm text-slate-600">
+                    These uploads belong to patients you have appointments with.
+                  </p>
+                  <div className="mt-5 grid gap-4 md:grid-cols-3">
+                    {patientUploads.map((file) => (
                       <div
                         key={file.id}
                         className="rounded-lg border border-slate-200 bg-slate-50 p-3"
                       >
                         <img
                           src={file.previewUrl}
-                          alt={file.name}
+                          alt={file.fileName}
                           className="h-28 w-full rounded-md object-cover"
                         />
                         <p className="mt-2 text-sm font-semibold text-slate-800">
-                          {file.name}
+                          {file.fileName}
                         </p>
-                        <p className="text-xs text-slate-500">{file.size}</p>
+                        <p className="text-xs text-slate-500">
+                          {file.patientName}
+                        </p>
                       </div>
-                    ))
-                  )}
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               <div className="fadeUp rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
                 <h2 className="text-3xl font-bold text-slate-950 mb-6">

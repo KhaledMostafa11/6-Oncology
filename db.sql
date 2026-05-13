@@ -159,6 +159,8 @@ CREATE TABLE IF NOT EXISTS patient_uploads (
     patient_id INT NOT NULL REFERENCES patients(patient_id) ON DELETE CASCADE,
     file_name VARCHAR(255) NOT NULL,
     file_type VARCHAR(80) NOT NULL,
+    file_size INT NOT NULL DEFAULT 0,
+    file_path VARCHAR(255) NOT NULL,
     notes TEXT,
     uploaded_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
