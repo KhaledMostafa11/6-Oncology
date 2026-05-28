@@ -2,7 +2,6 @@
 
 ## Project Information
 
-- Group number: GROUP_NO
 - Department: General Oncology Department
 - Standard focus: Healthcare quality, patient safety, and interoperability standards
 - Main technologies: Next.js, React, Tailwind CSS, PostgreSQL, Nodemailer, Google Calendar API
@@ -12,17 +11,6 @@
 This project is a frontend website and dashboard for a General Oncology Department. It supports patient visibility, treatment-unit monitoring, appointment scheduling, care-plan review, analytics, doctor prescriptions, patient image uploads, email communication, Google Calendar sync, a help assistant, and role-based navigation for admin, oncologist, oncology nurse, and patient users.
 
 The project also includes a PostgreSQL database schema in `db.sql`. The website uses backend API routes and PostgreSQL for login, registration, patients, care plans, appointments, treatment units, profile management, and analytics.
-
-## Team Task Distribution
-
-Replace the names below with the real group member names before final submission.
-
-| Member | Responsibility |
-| --- | --- |
-| Member 1 | Home page, About page, Standards page, UI consistency |
-| Member 2 | Dashboard, patients page, care-plan interface |
-| Member 3 | Treatment units, appointment schedule, analytics pages |
-| Member 4 | Database schema, README, final report |
 
 ## Website Pages
 
